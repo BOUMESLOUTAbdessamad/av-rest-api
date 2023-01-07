@@ -1,7 +1,6 @@
 import os
 from flask import Flask
 
-
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -22,3 +21,7 @@ app.secret_key = SECRET_KEY
 # DONE IMPLEMENT DATABASE URL
 SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:123456@localhost/safarinetwork'
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+
+AUTH0_DOMAIN = 'dev-aib6p7npbv32c4ov.us.auth0.com'
+ALGORITHMS = ['RS256']
+API_AUDIENCE = 'coffeeshop'
