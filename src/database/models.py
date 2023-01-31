@@ -22,42 +22,30 @@ def setup_db(app):
 def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
-    # Demo row for POSTMAN test
+
+    # Demo row for test
     hike = Hike(
         title='SUPER JEEP NORTHERN LIGHTS HUNT - FREE PHOTOS INCLUDED',
         price = 1500,
         description = "On this super jeep excursion, we take you off the beaten track and chase one of the world's most mysterious phenomena. Leave the city's bright lights behind to see the Northern Lights while your guide tells you about this natural wonder!" ,
         duration = "5 Hours", # In Hours/days
         departs_from = "N°93 cité 261, Hai En nedjma, Oran",
-        difficulty = 'Easy', # Array [Easy, Medium, Difficult] 
+        difficulty = 'Easy', # Enum [Easy, Medium, Difficult] 
         group_max = 10,
         group_min = 5,
         min_age = '16',
-        pick_up = True
+        pick_up = True 
+        # cover_image = "<IMAGE_URL>"
     )
 
     hike.insert()
 
 class Hike(db.Model):
     __tablename__ = "hikes"
-    ##/* Examples: 
-    # Title: SUPER JEEP NORTHERN LIGHTS HUNT - FREE PHOTOS INCLUDED
-    # Price : $159 / Adult
-    # Description: ABOUT TIPT
-    # AVAILABILITY  SEPT - APR
-    # DURATION ~4 HOURS
-    # DEPARTS FROM: Oran
-    # DIFFICULTY: EASY [Easy, Medium, Difficult]
-    # GROUP MAXIMUM: 15
-    # MINIMUM AGE: 6 YEARS
-    # PICK UP: YES
-    # MEET ON LOCATION: NO
-    # */
 
-    # Autoincrementing, unique primary key
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=True) 
-    price = db.Column(db.Double(), nullable=True)
+    price = db.Column(db.Float, nullable=True)
     description = db.Column(db.String(500), nullable=True) 
     duration = db.Column(db.String(100), nullable=True) # In Hours/days
     departs_from = db.Column(db.String(255), nullable=True)
@@ -79,6 +67,22 @@ class Hike(db.Model):
     def update(self):
         db.session.commit()
 
+    def format(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'price': self.price,
+            'description': self.description,
+            'duration': self.duration,
+            'departs_from': self.departs_from,
+            'difficulty': self.difficulty,
+            'group_max': self.group_max,
+            'group_min': self.group_min,
+            'min_age': self.min_age,
+            'pick_up': self.pick_up,
+            'available': self.available,
+            }
+    
     def __repr__(self):
         return json.dumps(self)
 
@@ -103,16 +107,28 @@ class Hike(db.Model):
 #     def __repr__(self):
 #         return json.dumps(self)
 
+
 class User(db.Model):
     __tablename__ = "users"
 
     # Autoincrementing, unique primary key
     id = db.Column(db.Integer, primary_key=True)
-    fullname = db.Column(db.String(255), nullable=False) 
-    id_number = db.Column(db.String(500), nullable=False) # MUST ME NOT NULLABLE
+    name = db.Column(db.String(255), nullable=False) 
+    id_number = db.Column(db.String(500), nullable=False) # MUST BE NOT NULLABLE
     birthday = db.Column(db.DateTime, nullable=False)
     # reviews = db.relationship('Review', backref='user', lazy=True)
     trips = db.relationship('Trip', backref='user', lazy=True)
+    created_at=db.Column(db.DateTime, nullable=False)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    email_verified = db.Column(db.String(255),default=False, nullable=False)
+    family_name= db.Column(db.String(255), nullable=False)
+    given_name= db.Column(db.String(255), nullable=False)
+    identities = db.Column(db.String(255), nullable=False)
+    locale = db.Column(db.String(4), nullable=False)
+    # name = db.Column(db.String(255), nullable=False)
+    nickname = db.Column(db.String(255), nullable=False)
+    picture = db.Column(db.String(500), nullable=False)
+    user_id = db.Column(db.String(255), nullable=False, unique=True)
 
     def insert(self):
         db.session.add(self)
@@ -134,7 +150,7 @@ class Trip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     booking_date = db.Column(db.DateTime, nullable=False)
     hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
-
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     # def short(self):
     #     short_recipe = [{'color': r['color'], 'parts': r['parts']} for r in json.loads(self.recipe)]
