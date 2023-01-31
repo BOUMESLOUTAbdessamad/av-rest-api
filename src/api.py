@@ -3,8 +3,8 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
-from .database.models import db_drop_and_create_all, db_migrate, setup_db, Hike
-from .auth.auth import AuthError, requires_auth
+from database.models import db_drop_and_create_all, db_migrate, setup_db, Hike
+from auth.auth import AuthError, requires_auth
 from config import app
 from constants import HIKES_PER_PAGE
 
@@ -12,25 +12,13 @@ db_migrate(app)
 setup_db(app)
 CORS(app)
 
-
 def paginate_hikes(request, data):
     page = request.args.get("page", 1, type=int)
 
     start = (page - 1) * HIKES_PER_PAGE
     end = start + HIKES_PER_PAGE
 
-    hikes = [hike.short() for hike in data]
-    current_hikes = hikes[start:end]
-
-    return current_hikes
-
-def paginate_detailed_hikes(request, data):
-    page = request.args.get("page", 1, type=int)
-
-    start = (page - 1) * HIKES_PER_PAGE
-    end = start + HIKES_PER_PAGE
-
-    hikes = [hike.long() for hike in data]
+    hikes = [hike.format() for hike in data]
     current_hikes = hikes[start:end]
 
     return current_hikes
@@ -45,28 +33,19 @@ def after_request(response):
     response.headers.add("Access-Control-Allow-Credentials", "true")
     return response
 
-'''
-@TODO uncomment the following line to initialize the datbase
-!! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
-!! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
-!! Running this funciton will add one
-'''
+
 # with app.app_context():
 #     db_drop_and_create_all()
 
 # ROUTES
-
-'''
-@TODO implement endpoint
-    GET /hikes
-'''
-
-@app.route('/hikes')
+@app.route('/api/v0.1-dev/hikes')
 def get_hikes():
-
+    data = Hike.query.all()
+    hikes = paginate_hikes(request, data)
+    print(hikes)
     try:
-        data = Hike.query.all()
-        hikes = paginate_hikes(request, data)
+
+
         return jsonify({
             "success": True,
             "hikes": hikes
@@ -75,108 +54,127 @@ def get_hikes():
     except:
         abort(404)
 
-
-'''
-@TODO implement endpoint
-    GET /hikes-detail
-
-'''
-@app.route('/hikes-detail')
-@requires_auth('get:hikes-detail')
-def get_hikes_detail(payload):
+@app.route('/api/v0.1-dev/hikes-detail/<int:hike_id>')
+def get_hikes_detail(hike_id):
 
     try:
-        data = Hike.query.all()
-        hikes = [hike.long() for hike in data]
+        data = Hike.query.filter(Hike.id==hike_id).one_or_none()
+
         return jsonify({
             "success": True,
-            "hikes": hikes
+            "hikes": data.format()
         })
     except:
         abort(404)
 
-'''
-@TODO implement endpoint
-    POST /hikes
-'''
 
-@app.route('/hikes', methods=['POST'])
-@requires_auth('post:hikes')
-def create_hikes(payload):
+@app.route('/api/v0.1-dev/hikes', methods=['POST'])
+# @requires_auth('post:hikes')
+def create_hikes():
 
     body = request.get_json()
     title = body.get('title')
-    recipe = body.get('recipe')
+    price = body.get('price')
+    description = body.get('description')
+    duration = body.get('duration')
+    departs_from = body.get('departs_from') # Google Maps API
+    difficulty = body.get('difficulty')
+    group_max = body.get('group_max')
+    group_min = body.get('group_min')
+    min_age = body.get('min_age')
+    pick_up = body.get('pick_up')
+
 
     try:
-        hike = Hike(title=title, recipe=json.dumps(recipe))
+        hike = Hike(
+                title=title,
+                price=price,
+                description=description,
+                duration=duration,
+                departs_from=departs_from,
+                difficulty=difficulty,
+                group_max=group_max,
+                group_min=group_min,
+                min_age=min_age,
+                pick_up=pick_up
+            )
+        
         hike.insert()
         return jsonify({
             "success": True,
-            "hikes": hike.long()
+            "hikes": hike.format()
         })
 
     except:
         abort(422)
 
 
-
-'''
-@TODO implement endpoint
-    PATCH /hikes/<id>
-'''
-
-@app.route('/hikes/<int:hike_id>', methods=['PATCH'])
-@requires_auth('patch:hikes')
-def update_hike(hike_id, payload):
+@app.route('/api/v0.1-dev/hikes/<int:hike_id>', methods=['PATCH'])
+# @requires_auth('patch:hikes')
+def update_hike(hike_id):
 
     if hike_id is None:
         abort(404)
 
     body = request.get_json()
-    new_title = body.get('title')
-    new_recipe = json.dumps(body.get('recipe'))
+    title = body.get('title')
+    price = body.get('price')
+    description = body.get('description')
+    duration = body.get('duration')
+    departs_from = body.get('departs_from') # Google Maps API
+    difficulty = body.get('difficulty')
+    group_max = body.get('group_max')
+    group_min = body.get('group_min')
+    min_age = body.get('min_age')
+    pick_up = body.get('pick_up')
+    # cover_image = body.get('cover_image')
+
+
+    # new_recipe = json.dumps(body.get('recipe'))
 
     try:
         hike = Hike.query.filter(Hike.id == hike_id).one_or_none()
 
-        hike.title = new_title
-        hike.recipe = new_recipe
+        hike.title = title
+        hike.price = price
+        hike.description = description
+        hike.duration = duration
+        hike.departs_from = departs_from
+        hike.difficulty = difficulty
+        hike.group_max = group_max
+        hike.group_min = group_min
+        hike.min_age = min_age
+        hike.pick_up = pick_up
+
         hike.update()
+
         return jsonify({
             "success" : True,
-            "hike": hike.long()
+            "hike": hike.format()
         })
     except:
         abort(422)
 
 
-'''
-@TODO implement endpoint
-    DELETE /hikes/<id>
-'''
+@app.route('/api/v0.1-dev/hikes/<int:hike_id>', methods=['DELETE'])
+# @requires_auth('delete:hikes')
+def delete_drink(hike_id):
+    hile = Hike.query.filter(Hike.id == hike_id).one_or_none()
 
-@app.route('/hikes/<int:hike_id>', methods=['DELETE'])
-@requires_auth('delete:hikes')
-def delete_drink(payload, hike_id):
-    drink = Hike.query.filter(Hike.id == hike_id).one_or_none()
-
-    if not drink:
+    if not hile:
         abort(404)
     
     try:
-        drink.delete()
+        hile.delete()
         return jsonify({
-            "sucess": True
+            "sucess": True,
+            "message": "Hike deleted!"
         })
     except:
         abort(422)
 
 
 # Error Handling
-'''
-Example error handling for unprocessable entity
-'''
 
 @app.errorhandler(422)
 def unprocessable(error):
@@ -186,10 +184,6 @@ def unprocessable(error):
         "message": "unprocessable"
     }), 422
 
-'''
-@TODO implement error handler for 404
-    error handler should conform to general task above
-'''
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
@@ -215,7 +209,10 @@ def bad_request(error):
             "message": "bad request"
         }), 400
 
-'''
-@TODO implement error handler for AuthError
-    error handler should conform to general task above
-'''
+
+@app.errorhandler(AuthError)
+def auth_error_handler(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
+
