@@ -54,7 +54,8 @@ class Hike(db.Model):
     min_age = db.Column(db.String(100), nullable=True)
     pick_up = db.Column(db.Boolean, default=False)
     available = db.Column(db.Boolean, default=True)
-    
+    trips = db.relationship('Trip', backref='hike')
+
     def insert(self):
         db.session.add(self)
         db.session.commit()
@@ -106,9 +107,9 @@ class Hike(db.Model):
 #     def __repr__(self):
 #         return json.dumps(self)
 
-bookings = db.Table('bookings', 
-            db.Column("hike_id", db.Integer, db.ForeignKey('hikes.id'), nullable=False),
-            db.Column("trip_id", db.Integer, db.ForeignKey('trips.id'), nullable=False))
+# bookings = db.Table('bookings',
+#             db.Column("hike_id", db.Integer, db.ForeignKey('hikes.id'), nullable=False),
+#             db.Column("trip_id", db.Integer, db.ForeignKey('trips.id'), nullable=False))
 
 class User(db.Model):
     __tablename__ = "users"
@@ -119,7 +120,6 @@ class User(db.Model):
     id_number = db.Column(db.String(500), nullable=False) # MUST BE NOT NULLABLE
     birthday = db.Column(db.DateTime, nullable=False)
     # reviews = db.relationship('Review', backref='user', lazy=True)
-    trips = db.relationship('Trip', backref='user', lazy=True)
     created_at=db.Column(db.DateTime, nullable=False)
     email = db.Column(db.String(255), nullable=False, unique=True)
     email_verified = db.Column(db.String(255),default=False, nullable=False)
@@ -144,17 +144,37 @@ class User(db.Model):
     def update(self):
         db.session.commit()
 
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'id_number': self.id_number,
+            'birthday': self.birthday,
+            'created_at': self.created_at,
+            'email': self.email,
+            'email_verified': self.email_verified,
+            'family_name': self.family_name,
+            'given_name': self.given_name,
+            'identities': self.identities,
+            'locale': self.locale,
+            'nickname': self.nickname,
+            'picture': self.picture,
+            'user_id': self.user_id,
+            }
+
     def __repr__(self):
         return json.dumps(self)
+
 
 class Trip(db.Model):
     __tablename__ = "trips"
 
     id = db.Column(db.Integer, primary_key=True)
     booking_date = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey('users.id'), nullable=False)
-    hikes = db.relationship('Hike', secondary=bookings,
-      backref=db.backref('trips', lazy=True))
+    status=db.Column(db.String(20), default="ordered",  nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
+
 
     def insert(self):
         db.session.add(self)
@@ -169,3 +189,11 @@ class Trip(db.Model):
 
     def __repr__(self):
         return json.dumps(self)
+
+    def format(self):
+        return {
+            "id": self.id,
+            "booking_date": self.booking_date,
+            "user_id": self.user_id,
+            "hike_id": self.hike_id
+        }

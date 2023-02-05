@@ -175,6 +175,21 @@ def delete_drink(hike_id):
 
 
 # Error Handling
+#Add trips by user_id
+@app.route('/api/v0/trips', methods = ['POST'])
+def book_hike():
+
+    body = request.get_json()
+    hike_id = body.get('hike_id')
+    user_id = body.get('user_id')
+
+    hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Example, should get the user_id from the current session
+    user = User.query.filter(User.id == user_id).one_or_none()
+    
+    trip = Trip(booking_date=datetime.now(), hike=hike, user=user)
+
+    trip.insert()
+    return jsonify({"trip": trip.format()})
 
 @app.errorhandler(422)
 def unprocessable(error):
