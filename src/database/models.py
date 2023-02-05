@@ -106,6 +106,9 @@ class Hike(db.Model):
 #     def __repr__(self):
 #         return json.dumps(self)
 
+bookings = db.Table('bookings', 
+            db.Column("hike_id", db.Integer, db.ForeignKey('hikes.id'), nullable=False),
+            db.Column("trip_id", db.Integer, db.ForeignKey('trips.id'), nullable=False))
 
 class User(db.Model):
     __tablename__ = "users"
@@ -124,11 +127,12 @@ class User(db.Model):
     given_name= db.Column(db.String(255), nullable=False)
     identities = db.Column(db.String(255), nullable=False)
     locale = db.Column(db.String(4), nullable=False)
-    # name = db.Column(db.String(255), nullable=False)
     nickname = db.Column(db.String(255), nullable=False)
     picture = db.Column(db.String(500), nullable=False)
     user_id = db.Column(db.String(255), nullable=False, unique=True)
+    trips = db.relationship('Trip', backref='user', lazy=True)
 
+    
     def insert(self):
         db.session.add(self)
         db.session.commit()
@@ -148,25 +152,9 @@ class Trip(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     booking_date = db.Column(db.DateTime, nullable=False)
-    hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    # def short(self):
-    #     short_recipe = [{'color': r['color'], 'parts': r['parts']} for r in json.loads(self.recipe)]
-    #     return {
-    #         'id': self.id,
-    #         'title': self.title,
-    #         'recipe': short_recipe
-    #     }
-
-    # def long(self):
-    #     return {
-    #         'id': self.id,
-    #         'title': self.title,
-    #         'recipe': json.loads(self.recipe)
-    #     }
-
-
+    user_id = db.Column("user_id", db.Integer, db.ForeignKey('users.id'), nullable=False)
+    hikes = db.relationship('Hike', secondary=bookings,
+      backref=db.backref('trips', lazy=True))
 
     def insert(self):
         db.session.add(self)

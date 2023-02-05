@@ -38,7 +38,7 @@ def after_request(response):
 #     db_drop_and_create_all()
 
 # ROUTES
-@app.route('/api/v0.1-dev/hikes')
+@app.route('/api/v0/hikes')
 def get_hikes():
     data = Hike.query.all()
     hikes = paginate_hikes(request, data)
@@ -54,7 +54,7 @@ def get_hikes():
     except:
         abort(404)
 
-@app.route('/api/v0.1-dev/hikes-detail/<int:hike_id>')
+@app.route('/api/v0/hikes-detail/<int:hike_id>')
 def get_hikes_detail(hike_id):
 
     try:
@@ -68,7 +68,7 @@ def get_hikes_detail(hike_id):
         abort(404)
 
 
-@app.route('/api/v0.1-dev/hikes', methods=['POST'])
+@app.route('/api/v0/hikes', methods=['POST'])
 # @requires_auth('post:hikes')
 def create_hikes():
 
@@ -109,7 +109,7 @@ def create_hikes():
         abort(422)
 
 
-@app.route('/api/v0.1-dev/hikes/<int:hike_id>', methods=['PATCH'])
+@app.route('/api/v0/hikes/<int:hike_id>', methods=['PATCH'])
 # @requires_auth('patch:hikes')
 def update_hike(hike_id):
 
@@ -156,7 +156,7 @@ def update_hike(hike_id):
         abort(422)
 
 
-@app.route('/api/v0.1-dev/hikes/<int:hike_id>', methods=['DELETE'])
+@app.route('/api/v0/hikes/<int:hike_id>', methods=['DELETE'])
 # @requires_auth('delete:hikes')
 def delete_drink(hike_id):
     hile = Hike.query.filter(Hike.id == hike_id).one_or_none()
