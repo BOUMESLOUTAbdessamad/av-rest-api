@@ -24,4 +24,4 @@ app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 
 AUTH0_DOMAIN = 'dev-aib6p7npbv32c4ov.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'coffeeshop'
+API_AUDIENCE = 'https://127.0.0.1:5000/'
