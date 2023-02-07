@@ -197,3 +197,22 @@ class Trip(db.Model):
             "user_id": self.user_id,
             "hike_id": self.hike_id
         }
+        
+    def format_trips_by_user(self):
+        return {
+            "id": self.id,
+            "booking_date": self.booking_date,
+            "user_id": self.user_id,
+            "hike_id": self.hike_id,
+            'title': self.hike.title,
+            'price': self.hike.price,
+            'description': self.hike.description,
+            'duration': self.hike.duration,
+            'departs_from': self.hike.departs_from,
+            'difficulty': self.hike.difficulty,
+            'group_max': self.hike.group_max,
+            'group_min': self.hike.group_min,
+            'min_age': self.hike.min_age,
+            'pick_up': self.hike.pick_up,
+            'available': self.hike.available,
+        }

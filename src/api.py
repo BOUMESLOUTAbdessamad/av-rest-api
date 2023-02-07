@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
-from database.models import db_drop_and_create_all, db_migrate, setup_db, Hike
+from database.models import db_drop_and_create_all, db_migrate, setup_db, Hike, User, Trip
 from auth.auth import AuthError, requires_auth
 from config import app
 from constants import HIKES_PER_PAGE
@@ -181,16 +181,29 @@ def book_hike():
 
     body = request.get_json()
     hike_id = body.get('hike_id')
-    user_id = body.get('user_id')
+    user_id = body.get('user_id') # Get user_id from auth0 access token (sub)
 
-    hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Example, should get the user_id from the current session
-    user = User.query.filter(User.id == user_id).one_or_none()
+    hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Get the user_id from the current auth0 session
+    user = User.query.filter(User.id == user_id).one_or_none() # Get the hike_id from the DB
+    trip = Trip(booking_date=datetime.now(), user=user, hike=hike)
     
-    trip = Trip(booking_date=datetime.now(), hike=hike, user=user)
-
     trip.insert()
     return jsonify({"trip": trip.format()})
 
+
+# Get Trips by user
+@app.route('/api/v0/users/<user_id>/trips')
+def get_trips_by_user(user_id):
+    
+    trips = Trip.query.join(Hike).filter(Trip.user_id == user_id).all()
+
+    return jsonify({
+        "success": True,
+        "trips": [trip.format_trips_by_user() for trip in trips]
+    })
+
+
+# Error Handling
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
