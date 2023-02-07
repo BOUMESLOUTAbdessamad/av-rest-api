@@ -7,6 +7,8 @@ from database.models import db_drop_and_create_all, db_migrate, setup_db, Hike, 
 from auth.auth import AuthError, requires_auth
 from config import app
 from constants import HIKES_PER_PAGE
+from datetime import datetime
+
 
 db_migrate(app)
 setup_db(app)
@@ -178,13 +180,78 @@ def delete_drink(hike_id):
 #Add trips by user_id
 @app.route('/api/v0/trips', methods = ['POST'])
 def book_hike():
+#Users
+@app.route('/api/v0/users')
+def get_users():
+    data = User.query.all()
+    users = paginate_hikes(request, data)
+    try:
+        return jsonify({
+            "success": True,
+            "users": users
+        })
+
+    except:
+        abort(404)
+
+
+@app.route('/api/v0/users', methods=['POST'])
+def add_user():
 
     body = request.get_json()
-    hike_id = body.get('hike_id')
-    user_id = body.get('user_id') # Get user_id from auth0 access token (sub)
 
+    id_number = body.get('id_number')
+    name = body.get('name')
+    user_id = body.get('user_id')
+    picture = body.get('picture')
+    nickname = body.get('nickname')
+    locale = body.get('locale')
+    identities = json.dumps(body.get('identities'))
+    given_name = body.get('given_name')
+    family_name = body.get('family_name')
+    email_verified = body.get('email_verified')
+    email = body.get('email')
+    birthday = body.get('birthday')
+    created_at = datetime.now()
+    # updated_at = datetime.now()
+
+    try:
+        user = User(
+            id_number =id_number,
+            name = name,
+            user_id = user_id,
+            picture = picture,
+            nickname = nickname,
+            locale = locale,
+            identities = identities,
+            given_name = given_name,
+            family_name = family_name,
+            email_verified = email_verified,
+            email = email,
+            birthday = birthday,
+            created_at = created_at,
+            # updated_at = updated_at
+        )
+        user.insert()
+        return jsonify({
+            "user": user.format()
+        })
+    except:
+        abort(422)
+
+#Add trips
+@app.route('/api/v0/trips', methods = ['POST'])
+@requires_auth('post:trips')
+def book_hike(payload):
+    
+    body = request.get_json()
+    hike_id = body.get('hike_id')
+
+    user_id = payload.get('sub')
+    # print(user_id)
     hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Get the user_id from the current auth0 session
-    user = User.query.filter(User.id == user_id).one_or_none() # Get the hike_id from the DB
+    user = User.query.filter(User.user_id == user_id).one_or_none() # Get the hike_id from the DB
+
     trip = Trip(booking_date=datetime.now(), user=user, hike=hike)
     
     trip.insert()
