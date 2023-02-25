@@ -36,8 +36,8 @@ def after_request(response):
     return response
 
 
-# with app.app_context():
-#     db_drop_and_create_all()
+with app.app_context():
+    db_create_all()
 
 # ROUTES
 @app.route('/api/v0/hikes')
