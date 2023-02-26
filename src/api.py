@@ -33,6 +33,7 @@ def after_request(response):
     response.headers.add("Access-Control-Allow-Headers", "Content-Type, Autorization, true")
     response.headers.add("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, PUT, OPTIONS") 
     response.headers.add("Access-Control-Allow-Credentials", "true")
+    response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
 
@@ -71,7 +72,7 @@ def get_hikes_detail(hike_id):
 
 
 @app.route('/api/v0/hikes', methods=['POST'])
-# @requires_auth('post:hikes')
+@requires_auth('post:hikes')
 def create_hikes():
 
     body = request.get_json()
@@ -176,10 +177,6 @@ def delete_drink(hike_id):
         abort(422)
 
 
-# Error Handling
-#Add trips by user_id
-@app.route('/api/v0/trips', methods = ['POST'])
-def book_hike():
 #Users
 @app.route('/api/v0/users')
 def get_users():
@@ -239,6 +236,39 @@ def add_user():
     except:
         abort(422)
 
+
+#Users
+# @app.route('/api/v0/logout')
+# @requires_auth('get:user-details')
+# def logout(payload):
+#     data = User.query.all()
+#     users = paginate_hikes(request, data)
+
+#     try:
+#         return jsonify({
+#             "success": True,
+#             "users": users
+#         })
+
+#     except:
+#         abort(404)
+
+@app.route('/api/v0/user-details')
+@requires_auth('get:user-details')
+def user_details(payload):
+
+    return jsonify({
+        "success": True,
+        "user-payload": payload
+    })
+    
+#Get all trips
+@app.route('/api/v0/trips')
+def get_bookins():
+    data = Trip.query.all()
+    trips = [trip.format() for trip in data]
+    return jsonify({"trips": trips})
+
 #Add trips
 @app.route('/api/v0/trips', methods = ['POST'])
 @requires_auth('post:trips')
@@ -246,8 +276,8 @@ def book_hike(payload):
     
     body = request.get_json()
     hike_id = body.get('hike_id')
+    user_id = payload.get('sub') # Get user_id from auth0 token
 
-    user_id = payload.get('sub')
     # print(user_id)
     hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Get the user_id from the current auth0 session
     user = User.query.filter(User.user_id == user_id).one_or_none() # Get the hike_id from the DB
@@ -287,7 +317,6 @@ def not_found(error):
         "message": "not found"
     }), 404
 
-
 @app.errorhandler(401)
 def unauthorised(error):
     return jsonify({
@@ -303,7 +332,6 @@ def bad_request(error):
             "error": 400, 
             "message": "bad request"
         }), 400
-
 
 @app.errorhandler(AuthError)
 def auth_error_handler(ex):
