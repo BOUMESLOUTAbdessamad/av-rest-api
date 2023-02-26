@@ -22,6 +22,9 @@ def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
 
+def db_create_all():
+    db.create_all()
+    
     # Demo row for test
     hike = Hike(
         title='SUPER JEEP NORTHERN LIGHTS HUNT - FREE PHOTOS INCLUDED',
