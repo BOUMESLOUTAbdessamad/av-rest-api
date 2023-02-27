@@ -135,7 +135,6 @@ class User(db.Model):
     user_id = db.Column(db.String(255), nullable=False, unique=True)
     trips = db.relationship('Trip', backref='user', lazy=True)
 
-    
     def insert(self):
         db.session.add(self)
         db.session.commit()
@@ -175,10 +174,9 @@ class Trip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     booking_date = db.Column(db.DateTime, nullable=False)
     status=db.Column(db.String(20), default="ordered",  nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
-
-    user_auth0_id = db.Column(db.String(), nullable=True, unique=True)
+    auth0_user_id = db.Column(db.String(), nullable=True, unique=True)
 
     def insert(self):
         db.session.add(self)
@@ -199,10 +197,13 @@ class Trip(db.Model):
             "id": self.id,
             "booking_date": self.booking_date,
             "user_id": self.user_id,
-            "hike_id": self.hike_id
+            "hike_id": self.hike_id,
+            "auth0_user_id": self.auth0_user_id,
+            "status": self.status,
         }
         
     def format_trips_by_user(self):
+
         return {
             "id": self.id,
             "booking_date": self.booking_date,

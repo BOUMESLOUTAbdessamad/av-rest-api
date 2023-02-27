@@ -3,10 +3,10 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
-from database.models import db_drop_and_create_all, db_migrate, setup_db, Hike, User, Trip
+from database.models import db_drop_and_create_all,db_create_all,  db_migrate, setup_db, Hike, User, Trip
 from auth.auth import AuthError, requires_auth
 from config import app
-from constants import HIKES_PER_PAGE
+from constants import RECORDS_PER_PAGE
 from datetime import datetime
 
 
@@ -17,8 +17,8 @@ CORS(app)
 def paginate_hikes(request, data):
     page = request.args.get("page", 1, type=int)
 
-    start = (page - 1) * HIKES_PER_PAGE
-    end = start + HIKES_PER_PAGE
+    start = (page - 1) * RECORDS_PER_PAGE
+    end = start + RECORDS_PER_PAGE
 
     hikes = [hike.format() for hike in data]
     current_hikes = hikes[start:end]
@@ -37,8 +37,8 @@ def after_request(response):
     return response
 
 
-with app.app_context():
-    db_create_all()
+# with app.app_context():
+#     db_create_all()
 
 # ROUTES
 @app.route('/api/v0/hikes')
@@ -47,7 +47,6 @@ def get_hikes():
     hikes = paginate_hikes(request, data)
     print(hikes)
     try:
-
 
         return jsonify({
             "success": True,
@@ -65,7 +64,7 @@ def get_hikes_detail(hike_id):
 
         return jsonify({
             "success": True,
-            "hikes": data.format()
+            "hike": data.format()
         })
     except:
         abort(404)
@@ -229,6 +228,7 @@ def add_user():
             created_at = created_at,
             # updated_at = updated_at
         )
+
         user.insert()
         return jsonify({
             "user": user.format()
@@ -276,23 +276,21 @@ def book_hike(payload):
     
     body = request.get_json()
     hike_id = body.get('hike_id')
-    user_id = payload.get('sub') # Get user_id from auth0 token
-
-    # print(user_id)
+    auth0_user_id = payload.get('sub') # Get user_id from auth0 token
     hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Get the user_id from the current auth0 session
-    user = User.query.filter(User.user_id == user_id).one_or_none() # Get the hike_id from the DB
-
-    trip = Trip(booking_date=datetime.now(), user=user, hike=hike)
     
-    trip.insert()
-    return jsonify({"trip": trip.format()})
+    # user = User.query.filter(User.user_id == user_id).one_or_none() # Get the hike_id from the DB
+    trip = Trip(booking_date=datetime.now(), hike=hike, auth0_user_id=auth0_user_id)
 
+    trip.insert()
+
+    return jsonify({"trip": trip.format()})
 
 # Get Trips by user
 @app.route('/api/v0/users/<user_id>/trips')
 def get_trips_by_user(user_id):
-    
-    trips = Trip.query.join(Hike).filter(Trip.user_id == user_id).all()
+
+    trips = Trip.query.join(Hike).filter(Trip.auth0_user_id == user_id).all()
 
     return jsonify({
         "success": True,
