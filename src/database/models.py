@@ -176,7 +176,7 @@ class Trip(db.Model):
     status=db.Column(db.String(20), default="ordered",  nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
-    auth0_user_id = db.Column(db.String(), nullable=True, unique=True)
+    auth0_user_id = db.Column(db.String(), nullable=True)
 
     def insert(self):
         db.session.add(self)
