@@ -154,6 +154,38 @@ $ curl -X POST  -H "Content-Type: application/json" -d
 
 ```
 
+### Get trips by User id
+
+```http
+GET /api/v0/users/<auth0_user_id>/trips
+```
+Example
+```http
+$ curl http://127.0.0.1:5000/api/v0/users/7/trips
+```
+Results (json)
+
+```http
+{
+    "hikes": [
+        {
+            "available": true,
+            "departs_from": "Oran",
+            "description": "On this super jeep excursion, we take you off the beaten track and chase one of the world's most mysterious phenomena. Leave the city's bright lights behind to see the Northern Lights while your guide tells you about this natural wonder!",
+            "difficulty": "Hard",
+            "duration": "5 Hours",
+            "group_max": 20,
+            "group_min": 10,
+            "id": 1,
+            "min_age": "18",
+            "pick_up": true,
+            "price": 1500.0,
+            "title": "SUPER JEEP NORTHERN LIGHTS HUNT - FREE PHOTOS INCLUDED"
+        }
+    ],
+    "success": true
+}
+```
 ## Response Codes
 We use standard HTTP codes to denote successful execution or indicate when errors occur. For some errors, the response will include
 additional information about the error, including an application error
