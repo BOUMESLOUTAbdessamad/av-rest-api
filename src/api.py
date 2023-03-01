@@ -286,7 +286,8 @@ def book_hike(payload):
 
     return jsonify({"trip": trip.format()})
 
-# Get Trips by user
+
+# Get All Trips by user
 @app.route('/api/v0/users/<user_id>/trips')
 def get_trips_by_user(user_id):
 
@@ -296,6 +297,22 @@ def get_trips_by_user(user_id):
         "success": True,
         "trips": [trip.format_trips_by_user() for trip in trips]
     })
+
+
+# DELETE Trip
+@app.route('/api/v0/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
+def delete_trip_by_user(user_id, trip_id):
+
+    trip = Trip.query.filter(Trip.auth0_user_id == user_id, Trip.id == trip_id).one_or_none()
+
+    try:
+        trip.delete()
+        return jsonify({
+            "success": True,
+            "message": "Trip deleted"
+        })
+    except:
+        abort(422)
 
 
 # Error Handling
