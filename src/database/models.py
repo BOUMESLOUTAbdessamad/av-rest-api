@@ -4,8 +4,17 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 from flask_migrate import Migrate
 
+
+# DATABASE Config
+
 database_name = 'adventure'
-database_path = 'postgresql://{}/{}'.format('postgres:123456@localhost:5432', database_name)
+
+if os.getenv('DATABASE_URL'):
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL').replace("postgres://", "postgresql://", 1)
+else:
+
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{}/{}'.format('postgres:123456@localhost:5432', database_name)
+
 
 db = SQLAlchemy()
 
@@ -13,7 +22,7 @@ def db_migrate(app):
     migrate = Migrate(app, db)
 
 def setup_db(app):
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_path
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
@@ -22,6 +31,9 @@ def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
 
+def db_create_all():
+    db.create_all()
+    
     # Demo row for test
     hike = Hike(
         title='SUPER JEEP NORTHERN LIGHTS HUNT - FREE PHOTOS INCLUDED',
@@ -132,7 +144,6 @@ class User(db.Model):
     user_id = db.Column(db.String(255), nullable=False, unique=True)
     trips = db.relationship('Trip', backref='user', lazy=True)
 
-    
     def insert(self):
         db.session.add(self)
         db.session.commit()
@@ -172,9 +183,9 @@ class Trip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     booking_date = db.Column(db.DateTime, nullable=False)
     status=db.Column(db.String(20), default="ordered",  nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
-
+    auth0_user_id = db.Column(db.String(), nullable=True)
 
     def insert(self):
         db.session.add(self)
@@ -195,10 +206,13 @@ class Trip(db.Model):
             "id": self.id,
             "booking_date": self.booking_date,
             "user_id": self.user_id,
-            "hike_id": self.hike_id
+            "hike_id": self.hike_id,
+            "auth0_user_id": self.auth0_user_id,
+            "status": self.status,
         }
         
     def format_trips_by_user(self):
+
         return {
             "id": self.id,
             "booking_date": self.booking_date,
