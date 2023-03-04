@@ -25,9 +25,6 @@ def paginate_hikes(request, data):
 
     return current_hikes
 
-#Implement CORS
-# cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
 @app.after_request
 def after_request(response):
     response.headers.add("Access-Control-Allow-Headers", "Content-Type, Autorization, true")
@@ -179,8 +176,6 @@ def delete_drink(hike_id):
     except:
         abort(422)
 
-
-
 ##Users
 
 @app.route('/api/v1/users')
@@ -217,7 +212,6 @@ def add_user():
     email = body.get('email')
     birthday = body.get('birthday')
     created_at = datetime.now()
-    # updated_at = datetime.now()
 
     try:
         user = User(
@@ -245,15 +239,6 @@ def add_user():
         abort(422)
 
 
-@app.route('/api/v1/user-details')
-@requires_auth('get:user-details')
-def user_details(payload):
-
-    return jsonify({
-        "success": True,
-        "user-payload": payload
-    })
-    
 #Get all trips
 @app.route('/api/v1/trips')
 @requires_auth('get:trips')
@@ -266,7 +251,7 @@ def get_bookins():
 @app.route('/api/v1/trips', methods = ['POST'])
 @requires_auth('post:trips')
 def book_hike(payload):
-    
+
     body = request.get_json()
     hike_id = body.get('hike_id')
     auth0_user_id = payload.get('sub') # Get user_id from auth0 token
@@ -290,7 +275,6 @@ def get_trips_by_user(user_id):
         "success": True,
         "trips": [trip.format_trips_by_user() for trip in trips]
     })
-
 
 # DELETE Trip
 @app.route('/api/v1/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
