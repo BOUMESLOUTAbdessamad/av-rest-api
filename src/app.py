@@ -241,6 +241,16 @@ def add_user(payload):
         abort(422)
 
 
+@app.route('/api/v1/user-details')
+@requires_auth('get:user-details')
+def user_details(payload):
+
+    return jsonify({
+        "success": True,
+        "user-payload": payload
+    })
+
+
 #Get all trips
 @app.route('/api/v1/trips')
 @requires_auth('get:trips')
