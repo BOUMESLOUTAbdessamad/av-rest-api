@@ -3,10 +3,10 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
-from database.models import db_drop_and_create_all, db_migrate, setup_db, Hike, User, Trip
+from database.models import db_drop_and_create_all,db_create_all,  db_migrate, setup_db, Hike, User, Trip
 from auth.auth import AuthError, requires_auth
 from config import app
-from constants import HIKES_PER_PAGE
+from constants import RECORDS_PER_PAGE
 from datetime import datetime
 
 
@@ -17,8 +17,8 @@ CORS(app)
 def paginate_hikes(request, data):
     page = request.args.get("page", 1, type=int)
 
-    start = (page - 1) * HIKES_PER_PAGE
-    end = start + HIKES_PER_PAGE
+    start = (page - 1) * RECORDS_PER_PAGE
+    end = start + RECORDS_PER_PAGE
 
     hikes = [hike.format() for hike in data]
     current_hikes = hikes[start:end]
@@ -33,11 +33,12 @@ def after_request(response):
     response.headers.add("Access-Control-Allow-Headers", "Content-Type, Autorization, true")
     response.headers.add("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, PUT, OPTIONS") 
     response.headers.add("Access-Control-Allow-Credentials", "true")
+    response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
 
 # with app.app_context():
-#     db_drop_and_create_all()
+#     db_create_all()
 
 # ROUTES
 @app.route('/api/v0/hikes')
@@ -46,7 +47,6 @@ def get_hikes():
     hikes = paginate_hikes(request, data)
     print(hikes)
     try:
-
 
         return jsonify({
             "success": True,
@@ -64,14 +64,14 @@ def get_hikes_detail(hike_id):
 
         return jsonify({
             "success": True,
-            "hikes": data.format()
+            "hike": data.format()
         })
     except:
         abort(404)
 
 
 @app.route('/api/v0/hikes', methods=['POST'])
-# @requires_auth('post:hikes')
+@requires_auth('post:hikes')
 def create_hikes():
 
     body = request.get_json()
@@ -176,10 +176,6 @@ def delete_drink(hike_id):
         abort(422)
 
 
-# Error Handling
-#Add trips by user_id
-@app.route('/api/v0/trips', methods = ['POST'])
-def book_hike():
 #Users
 @app.route('/api/v0/users')
 def get_users():
@@ -232,12 +228,46 @@ def add_user():
             created_at = created_at,
             # updated_at = updated_at
         )
+
         user.insert()
         return jsonify({
             "user": user.format()
         })
     except:
         abort(422)
+
+
+#Users
+# @app.route('/api/v0/logout')
+# @requires_auth('get:user-details')
+# def logout(payload):
+#     data = User.query.all()
+#     users = paginate_hikes(request, data)
+
+#     try:
+#         return jsonify({
+#             "success": True,
+#             "users": users
+#         })
+
+#     except:
+#         abort(404)
+
+@app.route('/api/v0/user-details')
+@requires_auth('get:user-details')
+def user_details(payload):
+
+    return jsonify({
+        "success": True,
+        "user-payload": payload
+    })
+    
+#Get all trips
+@app.route('/api/v0/trips')
+def get_bookins():
+    data = Trip.query.all()
+    trips = [trip.format() for trip in data]
+    return jsonify({"trips": trips})
 
 #Add trips
 @app.route('/api/v0/trips', methods = ['POST'])
@@ -246,28 +276,43 @@ def book_hike(payload):
     
     body = request.get_json()
     hike_id = body.get('hike_id')
-
-    user_id = payload.get('sub')
-    # print(user_id)
+    auth0_user_id = payload.get('sub') # Get user_id from auth0 token
     hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Get the user_id from the current auth0 session
-    user = User.query.filter(User.user_id == user_id).one_or_none() # Get the hike_id from the DB
-
-    trip = Trip(booking_date=datetime.now(), user=user, hike=hike)
     
+    # user = User.query.filter(User.user_id == user_id).one_or_none() # Get the hike_id from the DB
+    trip = Trip(booking_date=datetime.now(), hike=hike, auth0_user_id=auth0_user_id)
+
     trip.insert()
+
     return jsonify({"trip": trip.format()})
 
 
-# Get Trips by user
+# Get All Trips by user
 @app.route('/api/v0/users/<user_id>/trips')
 def get_trips_by_user(user_id):
-    
-    trips = Trip.query.join(Hike).filter(Trip.user_id == user_id).all()
+
+    trips = Trip.query.join(Hike).filter(Trip.auth0_user_id == user_id).all()
 
     return jsonify({
         "success": True,
         "trips": [trip.format_trips_by_user() for trip in trips]
     })
+
+
+# DELETE Trip
+@app.route('/api/v0/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
+def delete_trip_by_user(user_id, trip_id):
+
+    trip = Trip.query.filter(Trip.auth0_user_id == user_id, Trip.id == trip_id).one_or_none()
+
+    try:
+        trip.delete()
+        return jsonify({
+            "success": True,
+            "message": "Trip deleted"
+        })
+    except:
+        abort(422)
 
 
 # Error Handling
@@ -287,7 +332,6 @@ def not_found(error):
         "message": "not found"
     }), 404
 
-
 @app.errorhandler(401)
 def unauthorised(error):
     return jsonify({
@@ -303,7 +347,6 @@ def bad_request(error):
             "error": 400, 
             "message": "bad request"
         }), 400
-
 
 @app.errorhandler(AuthError)
 def auth_error_handler(ex):
