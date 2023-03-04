@@ -3,6 +3,8 @@
 
 After a busy week of hardwork, you may go out for a weekend alone or with your awesome friends, to walk, relax and feel the energy of nature. Adventure Vibe is a travel app for hikers. It allows you book a trip in one click.
 
+(This project is similar to [Adventures.com](https://adventures.com))
+
 With Adventure Vibe App you can:
 
 - Display hikes.
