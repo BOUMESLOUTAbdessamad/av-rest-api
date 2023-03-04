@@ -42,6 +42,9 @@ def after_request(response):
 
 
 # ROUTES
+@app.route('/') # GET /api/v1/hikes
+def index():
+    return "Welcome to Adventure Vibe"
 
 ##Hikes
 
@@ -49,7 +52,6 @@ def after_request(response):
 def get_hikes():
     data = Hike.query.all()
     hikes = paginate_hikes(request, data)
-    print(hikes)
     try:
 
         return jsonify({
