@@ -14,7 +14,7 @@ With Adventure Vibe App you can:
 - Delete trips
 - Users CRUD
 
-Application URL: [adventure-vibes.onrender.com](https://adventure-vibes.onrender.com/)
+Application URL: [adventure-vibes.onrender.com](https://adventure-vibes.onrender.com/) Hosted in Render Cloud Platform
 
 
 Login Page : [Login](https://dev-aib6p7npbv32c4ov.us.auth0.com/authorize?audience=https://127.0.0.1:5000/&response_type=token&client_id=QGj5Sw2KpPZnDHpij5blTxiT4It5swSU&redirect_uri=https://adventure-vibes.onrender.com/api/v1/user-details)
