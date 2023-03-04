@@ -271,13 +271,13 @@ def book_hike(payload):
     hike_id = body.get('hike_id')
     auth0_user_id = payload.get('sub') # Get user_id from auth0 token
     hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Get the user_id from the current auth0 session
-    
-    trip = Trip(booking_date=datetime.now(), hike=hike, auth0_user_id=auth0_user_id)
 
-    trip.insert()
-
-    return jsonify({"trip": trip.format()})
-
+    try:
+        trip = Trip(booking_date=datetime.now(), hike=hike, auth0_user_id=auth0_user_id)
+        trip.insert()
+        return jsonify({"trip": trip.format()})
+    except:
+        abort(422)
 
 # Get All Trips by user
 @app.route('/api/v1/users/<user_id>/trips')
