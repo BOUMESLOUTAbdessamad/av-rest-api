@@ -30,6 +30,21 @@ def setup_db(app):
 def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
+    # Demo row for test
+    hike = Hike(
+        title='SUPER JEEP NORTHERN LIGHTS HUNT - FREE PHOTOS INCLUDED',
+        price = 1500,
+        description = "On this super jeep excursion, we take you off the beaten track and chase one of the world's most mysterious phenomena. Leave the city's bright lights behind to see the Northern Lights while your guide tells you about this natural wonder!" ,
+        duration = "5 Hours", # In Hours/days
+        departs_from = "N°93 cité 261, Hai En nedjma, Oran",
+        difficulty = 'Easy', # Enum [Easy, Medium, Difficult] 
+        group_max = 10,
+        group_min = 5,
+        min_age = '16',
+        pick_up = True 
+    )
+    hike.insert()
+
 
 def db_create_all():
     db.create_all()
@@ -46,7 +61,6 @@ def db_create_all():
         group_min = 5,
         min_age = '16',
         pick_up = True 
-        # cover_image = "<IMAGE_URL>"
     )
 
     hike.insert()
@@ -97,31 +111,6 @@ class Hike(db.Model):
     
     def __repr__(self):
         return json.dumps(self)
-
-# class Review(db.Model):
-#     __tablename__ = "reviews"
-#     id = db.Column(db.Integer, primary_key=True)
-#     stars = db.Column(db.Integer, nullable=False, default=1)
-#     text = db.Column(db.String(500), nullable=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-#     def insert(self):
-#         db.session.add(self)
-#         db.session.commit()
-
-#     def delete(self):
-#         db.session.delete(self)
-#         db.session.commit()
-
-#     def update(self):
-#         db.session.commit()
-
-#     def __repr__(self):
-#         return json.dumps(self)
-
-# bookings = db.Table('bookings',
-#             db.Column("hike_id", db.Integer, db.ForeignKey('hikes.id'), nullable=False),
-#             db.Column("trip_id", db.Integer, db.ForeignKey('trips.id'), nullable=False))
 
 class User(db.Model):
     __tablename__ = "users"
@@ -182,7 +171,7 @@ class Trip(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     booking_date = db.Column(db.DateTime, nullable=False)
-    status=db.Column(db.String(20), default="ordered",  nullable=False)
+    status = db.Column(db.String(20), default="ordered",  nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
     auth0_user_id = db.Column(db.String(), nullable=True)
