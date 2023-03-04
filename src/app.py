@@ -40,8 +40,12 @@ def after_request(response):
 # with app.app_context():
 #     db_create_all()
 
+
 # ROUTES
-@app.route('/api/v0/hikes')
+
+##Hikes
+
+@app.route('/api/v0/hikes') # GET /api/v0/hikes
 def get_hikes():
     data = Hike.query.all()
     hikes = paginate_hikes(request, data)
@@ -56,7 +60,7 @@ def get_hikes():
     except:
         abort(404)
 
-@app.route('/api/v0/hikes-detail/<int:hike_id>')
+@app.route('/api/v0/hikes-detail/<int:hike_id>') # GET /api/v0/hikes-detail/<int:hike_id>
 def get_hikes_detail(hike_id):
 
     try:
@@ -70,7 +74,7 @@ def get_hikes_detail(hike_id):
         abort(404)
 
 
-@app.route('/api/v0/hikes', methods=['POST'])
+@app.route('/api/v0/hikes', methods=['POST']) # POST /api/v0/hikes
 @requires_auth('post:hikes')
 def create_hikes():
 
@@ -111,7 +115,7 @@ def create_hikes():
         abort(422)
 
 
-@app.route('/api/v0/hikes/<int:hike_id>', methods=['PATCH'])
+@app.route('/api/v0/hikes/<int:hike_id>', methods=['PATCH']) # PATCH /api/v0/hikes/<int:hike_id>
 # @requires_auth('patch:hikes')
 def update_hike(hike_id):
 
@@ -123,16 +127,13 @@ def update_hike(hike_id):
     price = body.get('price')
     description = body.get('description')
     duration = body.get('duration')
-    departs_from = body.get('departs_from') # Google Maps API
+    departs_from = body.get('departs_from')
     difficulty = body.get('difficulty')
     group_max = body.get('group_max')
     group_min = body.get('group_min')
     min_age = body.get('min_age')
     pick_up = body.get('pick_up')
     # cover_image = body.get('cover_image')
-
-
-    # new_recipe = json.dumps(body.get('recipe'))
 
     try:
         hike = Hike.query.filter(Hike.id == hike_id).one_or_none()
@@ -158,7 +159,7 @@ def update_hike(hike_id):
         abort(422)
 
 
-@app.route('/api/v0/hikes/<int:hike_id>', methods=['DELETE'])
+@app.route('/api/v0/hikes/<int:hike_id>', methods=['DELETE']) # DELETE /api/v0/hikes/<int:hike_id>
 # @requires_auth('delete:hikes')
 def delete_drink(hike_id):
     hile = Hike.query.filter(Hike.id == hike_id).one_or_none()
@@ -176,8 +177,11 @@ def delete_drink(hike_id):
         abort(422)
 
 
-#Users
+
+##Users
+
 @app.route('/api/v0/users')
+@requires_auth('get:users')
 def get_users():
     data = User.query.all()
     users = paginate_hikes(request, data)
@@ -236,22 +240,6 @@ def add_user():
     except:
         abort(422)
 
-
-#Users
-# @app.route('/api/v0/logout')
-# @requires_auth('get:user-details')
-# def logout(payload):
-#     data = User.query.all()
-#     users = paginate_hikes(request, data)
-
-#     try:
-#         return jsonify({
-#             "success": True,
-#             "users": users
-#         })
-
-#     except:
-#         abort(404)
 
 @app.route('/api/v0/user-details')
 @requires_auth('get:user-details')
