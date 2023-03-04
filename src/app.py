@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
-from database.models import db_drop_and_create_all,db_create_all,  db_migrate, setup_db, Hike, User, Trip
+from database.models import db_drop_and_create_all, db_create_all,  db_migrate, setup_db, Hike, User, Trip
 from auth.auth import AuthError, requires_auth
 from config import app
 from constants import RECORDS_PER_PAGE
@@ -39,6 +39,9 @@ def after_request(response):
 
 # with app.app_context():
 #     db_create_all()
+
+# with app.app_context():
+#     db_drop_and_create_all()
 
 
 # ROUTES
@@ -116,7 +119,7 @@ def create_hikes():
 
 
 @app.route('/api/v0/hikes/<int:hike_id>', methods=['PATCH']) # PATCH /api/v0/hikes/<int:hike_id>
-# @requires_auth('patch:hikes')
+@requires_auth('patch:hikes')
 def update_hike(hike_id):
 
     if hike_id is None:
@@ -160,7 +163,7 @@ def update_hike(hike_id):
 
 
 @app.route('/api/v0/hikes/<int:hike_id>', methods=['DELETE']) # DELETE /api/v0/hikes/<int:hike_id>
-# @requires_auth('delete:hikes')
+@requires_auth('delete:hikes')
 def delete_drink(hike_id):
     hile = Hike.query.filter(Hike.id == hike_id).one_or_none()
 
@@ -196,6 +199,7 @@ def get_users():
 
 
 @app.route('/api/v0/users', methods=['POST'])
+@requires_auth('post:users')
 def add_user():
 
     body = request.get_json()
@@ -252,6 +256,7 @@ def user_details(payload):
     
 #Get all trips
 @app.route('/api/v0/trips')
+@requires_auth('get:trips')
 def get_bookins():
     data = Trip.query.all()
     trips = [trip.format() for trip in data]
@@ -267,7 +272,6 @@ def book_hike(payload):
     auth0_user_id = payload.get('sub') # Get user_id from auth0 token
     hike = Hike.query.filter(Hike.id == hike_id).one_or_none() # Get the user_id from the current auth0 session
     
-    # user = User.query.filter(User.user_id == user_id).one_or_none() # Get the hike_id from the DB
     trip = Trip(booking_date=datetime.now(), hike=hike, auth0_user_id=auth0_user_id)
 
     trip.insert()
@@ -277,6 +281,7 @@ def book_hike(payload):
 
 # Get All Trips by user
 @app.route('/api/v0/users/<user_id>/trips')
+@requires_auth('get:user-trips')
 def get_trips_by_user(user_id):
 
     trips = Trip.query.join(Hike).filter(Trip.auth0_user_id == user_id).all()
@@ -289,6 +294,7 @@ def get_trips_by_user(user_id):
 
 # DELETE Trip
 @app.route('/api/v0/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
+@requires_auth('get:user-trips')
 def delete_trip_by_user(user_id, trip_id):
 
     trip = Trip.query.filter(Trip.auth0_user_id == user_id, Trip.id == trip_id).one_or_none()
