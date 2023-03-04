@@ -245,9 +245,14 @@ def add_user():
 @app.route('/api/v1/trips')
 @requires_auth('get:trips')
 def get_bookins():
-    data = Trip.query.all()
-    trips = [trip.format() for trip in data]
-    return jsonify({"trips": trips})
+
+    try:
+        data = Trip.query.all()
+        trips = [trip.format() for trip in data]
+        return jsonify({"trips": trips})
+    except:
+        abort(404)
+
 
 #Add trips
 @app.route('/api/v1/trips', methods = ['POST'])
