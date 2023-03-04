@@ -37,8 +37,8 @@ def after_request(response):
     return response
 
 
-# with app.app_context():
-#     db_create_all()
+with app.app_context():
+    db_create_all()
 
 
 # ROUTES
