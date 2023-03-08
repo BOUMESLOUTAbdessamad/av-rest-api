@@ -9,6 +9,7 @@ from config import app
 from constants import RECORDS_PER_PAGE
 from datetime import datetime
 
+#CODE in a spcecific date git commit --date="2023-03-00 00:00:00"
 
 db_migrate(app)
 setup_db(app)
