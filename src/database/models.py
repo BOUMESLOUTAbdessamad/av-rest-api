@@ -81,7 +81,8 @@ class Hike(db.Model):
     pick_up = db.Column(db.Boolean, default=False)
     available = db.Column(db.Boolean, default=True)
     trips = db.relationship('Trip', backref='hike')
-
+    cover = db.Column(db.String(), nullable=True)
+    
     def insert(self):
         db.session.add(self)
         db.session.commit()
