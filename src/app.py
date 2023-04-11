@@ -120,7 +120,7 @@ def create_hikes(payload):
 
 @app.route('/api/v0/hikes/<int:hike_id>', methods=['PATCH']) # PATCH /api/v0/hikes/<int:hike_id>
 @requires_auth('patch:hikes')
-def update_hike(hike_id, payload):
+def update_hike(payload, hike_id):
 
     if hike_id is None:
         abort(404)
@@ -164,7 +164,7 @@ def update_hike(hike_id, payload):
 
 @app.route('/api/v0/hikes/<int:hike_id>', methods=['DELETE']) # DELETE /api/v0/hikes/<int:hike_id>
 @requires_auth('delete:hikes')
-def delete_drink(hike_id, payload):
+def delete_drink(payload, hike_id):
     hile = Hike.query.filter(Hike.id == hike_id).one_or_none()
 
     if not hile:
@@ -264,7 +264,6 @@ def get_bookings(payload):
     except:
         abort(404)
 
-
 #Add trips
 @app.route('/api/v0/trips', methods = ['POST'])
 @requires_auth('post:trips')
@@ -282,23 +281,25 @@ def book_hike(payload):
     except:
         abort(422)
 
+
 # Get Trips by user
 @app.route('/api/v0/users/<user_id>/trips')
 @requires_auth('get:user-trips')
-def get_trips_by_user(user_id):
+def get_trips_by_user(payload, user_id):
 
     trips = Trip.query.join(Hike).filter(Trip.auth0_user_id == user_id).all()
 
     return jsonify({
         "success": True,
         "trips": [trip.format_trips_by_user() for trip in trips],
-
     })
+
+
 
 # DELETE Trip
 @app.route('/api/v0/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
 # @requires_auth('delete:user-trips')
-def delete_trip_by_user(user_id, trip_id, payload):
+def delete_trip_by_user(payload, user_id, trip_id):
 
     trip = Trip.query.filter(Trip.auth0_user_id == user_id, Trip.id == trip_id).one_or_none()
 
