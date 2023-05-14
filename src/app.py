@@ -8,6 +8,7 @@ from auth.auth import AuthError, requires_auth
 from config import app
 from constants import RECORDS_PER_PAGE
 from datetime import datetime
+from helpers import paginate_hikes
 
 #CODE in a spcecific date git commit --date="2023-03-00 00:00:00"
 
@@ -15,16 +16,6 @@ db_migrate(app)
 setup_db(app)
 CORS(app)
 
-def paginate_hikes(request, data):
-    page = request.args.get("page", 1, type=int)
-
-    start = (page - 1) * RECORDS_PER_PAGE
-    end = start + RECORDS_PER_PAGE
-
-    hikes = [hike.format() for hike in data]
-    current_hikes = hikes[start:end]
-
-    return current_hikes
 
 @app.after_request
 def after_request(response):
