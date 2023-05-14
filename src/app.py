@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
-from flask_cors import CORS
+
 from database.models import db_drop_and_create_all, db_create_all,  db_migrate, setup_db, Hike, User, Trip
 from auth.auth import AuthError, requires_auth
 from config import app
@@ -11,20 +11,6 @@ from datetime import datetime
 from helpers import paginate_hikes
 
 #CODE in a spcecific date git commit --date="2023-03-00 00:00:00"
-
-db_migrate(app)
-setup_db(app)
-CORS(app)
-
-
-@app.after_request
-def after_request(response):
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type, Autorization, true")
-    response.headers.add("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, PUT, OPTIONS") 
-    response.headers.add("Access-Control-Allow-Credentials", "true")
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
-
 
 # with app.app_context():
 #     db_create_all()
