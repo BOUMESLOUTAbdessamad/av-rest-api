@@ -4,8 +4,6 @@ from flask import jsonify
 from config import app
 
 
-
-
 # Error Handling
 @app.errorhandler(422)
 def unprocessable(error):
