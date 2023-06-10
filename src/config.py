@@ -16,11 +16,11 @@ DEBUG = True
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
-SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:123456@localhost/safarinetwork'
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:123456@localhost/adventure'
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 AUTH0_DOMAIN = 'dev-aib6p7npbv32c4ov.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'https://127.0.0.1:5000/'
+API_AUDIENCE = 'adventure-dev-api'
 
 db_migrate(app)
 setup_db(app)
