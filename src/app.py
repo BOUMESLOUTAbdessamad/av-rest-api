@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 
-from database.models import Hike, User, Trip
+from database.models import Hike, User, Trip, db_drop_and_create_all, db_create_all
 from auth.auth import  requires_auth
 from config import app
 from constants import RECORDS_PER_PAGE
@@ -24,12 +24,12 @@ def index():
 
 # Hikes API Endpoints
 
-@app.route('/api/v0/hikes') 
+@app.route('/api/v1/hikes') 
 def get_hikes():
     data = Hike.query.all()
     hikes = paginate_hikes(request, data)
-    try:
 
+    try:
         return jsonify({
             "success": True,
             "hikes": hikes
@@ -38,7 +38,7 @@ def get_hikes():
     except:
         abort(404)
 
-@app.route('/api/v0/hikes-detail/<int:hike_id>')
+@app.route('/api/v1/hikes-detail/<int:hike_id>')
 def get_hikes_detail(hike_id):
 
     try:
@@ -52,9 +52,9 @@ def get_hikes_detail(hike_id):
         abort(404)
 
 
-@app.route('/api/v0/hikes', methods=['POST'])
-@requires_auth('post:hikes')
-def create_hikes(payload):
+@app.route('/api/v1/hikes', methods=['POST'])
+# @requires_auth('post:hikes')
+def create_hikes():
 
     body = request.get_json()
     title = body.get('title')
@@ -93,7 +93,7 @@ def create_hikes(payload):
         abort(422)
 
 
-@app.route('/api/v0/hikes/<int:hike_id>', methods=['PATCH'])
+@app.route('/api/v1/hikes/<int:hike_id>', methods=['PATCH'])
 @requires_auth('patch:hikes')
 def update_hike(payload, hike_id):
 
@@ -137,7 +137,7 @@ def update_hike(payload, hike_id):
         abort(422)
 
 
-@app.route('/api/v0/hikes/<int:hike_id>', methods=['DELETE'])
+@app.route('/api/v1/hikes/<int:hike_id>', methods=['DELETE'])
 @requires_auth('delete:hikes')
 def delete_drink(payload, hike_id):
     hile = Hike.query.filter(Hike.id == hike_id).one_or_none()
@@ -155,7 +155,7 @@ def delete_drink(payload, hike_id):
         abort(422)
 
 # Users API Endpoints
-@app.route('/api/v0/users')
+@app.route('/api/v1/users')
 @requires_auth('get:users')
 def get_users(payload):
     data = User.query.all()
@@ -170,7 +170,7 @@ def get_users(payload):
         abort(404)
 
 
-@app.route('/api/v0/users', methods=['POST'])
+@app.route('/api/v1/users', methods=['POST'])
 @requires_auth('post:users')
 def add_user(payload):
 
@@ -216,7 +216,7 @@ def add_user(payload):
         abort(422)
 
 
-@app.route('/api/v0/user-details')
+@app.route('/api/v1/user-details')
 @requires_auth('get:user-details')
 def user_details(payload):
 
@@ -228,7 +228,7 @@ def user_details(payload):
 
 #Trips API Endpoints
 
-@app.route('/api/v0/trips')
+@app.route('/api/v1/trips')
 @requires_auth('get:trips')
 def get_bookings(payload):
 
@@ -239,7 +239,7 @@ def get_bookings(payload):
     except:
         abort(404)
 
-@app.route('/api/v0/trips', methods = ['POST'])
+@app.route('/api/v1/trips', methods = ['POST'])
 @requires_auth('post:trips')
 def book_hike(payload):
 
@@ -252,11 +252,12 @@ def book_hike(payload):
         trip = Trip(booking_date=datetime.now(), hike=hike, auth0_user_id=auth0_user_id)
         trip.insert()
         return jsonify({"trip": trip.format()})
+    
     except:
         abort(422)
 
 
-@app.route('/api/v0/users/<user_id>/trips')
+@app.route('/api/v1/users/<user_id>/trips') 
 @requires_auth('get:user-trips')
 def get_trips_by_user(payload, user_id):
 
@@ -268,8 +269,7 @@ def get_trips_by_user(payload, user_id):
     })
 
 
-
-@app.route('/api/v0/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
+@app.route('/api/v1/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
 # @requires_auth('delete:user-trips')
 def delete_trip_by_user(payload, user_id, trip_id):
 
