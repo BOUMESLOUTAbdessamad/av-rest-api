@@ -81,8 +81,50 @@ class Hike(db.Model):
     pick_up = db.Column(db.Boolean, default=False)
     available = db.Column(db.Boolean, default=True)
     trips = db.relationship('Trip', backref='hike')
+    categories = db.relationship('Category', backref='hike') # Treck, Camping, Bushcraft 
     cover = db.Column(db.String(), nullable=True)
     
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def format(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'price': self.price,
+            'description': self.description,
+            'duration': self.duration,
+            'departs_from': self.departs_from,
+            'difficulty': self.difficulty,
+            'group_max': self.group_max,
+            'group_min': self.group_min,
+            'min_age': self.min_age,
+            'pick_up': self.pick_up,
+            'available': self.available,
+            'cover' : self.cover
+            }
+    
+    def __repr__(self):
+        return json.dumps(self)
+    
+class Category(db.Model):
+    __tablename__ = "categories"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=True) 
+    description = db.Column(db.String(500), nullable=True) 
+    trips = db.relationship('Trip', backref='hike')
+    cover = db.Column(db.String(), nullable=True)
+    hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
+
     def insert(self):
         db.session.add(self)
         db.session.commit()
@@ -112,6 +154,8 @@ class Hike(db.Model):
     
     def __repr__(self):
         return json.dumps(self)
+    
+
 
 class User(db.Model):
     __tablename__ = "users"
