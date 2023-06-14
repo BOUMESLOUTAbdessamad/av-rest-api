@@ -4,17 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 from flask_migrate import Migrate
 
-
 # DATABASE Config
-
 database_name = 'adventure'
 
 if os.getenv('DATABASE_URL'):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL').replace("postgres://", "postgresql://", 1)
 else:
-
     SQLALCHEMY_DATABASE_URI = 'postgresql://{}/{}'.format('postgres:123456@localhost:5432', database_name)
-
 
 db = SQLAlchemy()
 
@@ -65,6 +61,10 @@ def db_create_all():
 
     hike.insert()
 
+
+
+
+
 class Hike(db.Model):
     __tablename__ = "hikes"
 
@@ -81,7 +81,9 @@ class Hike(db.Model):
     pick_up = db.Column(db.Boolean, default=False)
     available = db.Column(db.Boolean, default=True)
     trips = db.relationship('Trip', backref='hike')
-    categories = db.relationship('Category', backref='hike') # Treck, Camping, Bushcraft 
+    categories = db.relationship('Category', backref='hike') # Treck, Camping, Bushcraft, Short Stay, Trend
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
+
     cover = db.Column(db.String(), nullable=True)
     
     def insert(self):
@@ -119,11 +121,10 @@ class Category(db.Model):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(80), nullable=True) 
+    title = db.Column(db.String(), nullable=True) 
     description = db.Column(db.String(500), nullable=True) 
-    trips = db.relationship('Trip', backref='hike')
     cover = db.Column(db.String(), nullable=True)
-    hike_id = db.Column(db.Integer, db.ForeignKey('hikes.id'), nullable=False)
+    hikes = db.relationship('Hike', backref='category')
 
     def insert(self):
         db.session.add(self)
@@ -140,16 +141,8 @@ class Category(db.Model):
         return {
             'id': self.id,
             'title': self.title,
-            'price': self.price,
             'description': self.description,
-            'duration': self.duration,
-            'departs_from': self.departs_from,
-            'difficulty': self.difficulty,
-            'group_max': self.group_max,
-            'group_min': self.group_min,
-            'min_age': self.min_age,
-            'pick_up': self.pick_up,
-            'available': self.available,
+            'cover': self.cover,
             }
     
     def __repr__(self):
@@ -210,7 +203,6 @@ class User(db.Model):
     def __repr__(self):
         return json.dumps(self)
 
-
 class Trip(db.Model):
     __tablename__ = "trips"
 
@@ -244,7 +236,7 @@ class Trip(db.Model):
             "auth0_user_id": self.auth0_user_id,
             "status": self.status,
         }
-        
+
     def format_trips_by_user(self):
 
         return {
