@@ -8,7 +8,7 @@ After a busy week of hardwork, you may go out for a weekend alone or with your a
 With Adventure Vibe App you can:
 
 - Display hikes.
-- Delete hikes.
+- Delete hikes (dev)
 - Add hikes
 - Create trips
 - Delete trips
