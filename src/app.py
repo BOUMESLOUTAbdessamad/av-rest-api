@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 
-from database.models import Hike, User, Trip, db_drop_and_create_all, db_create_all
+from database.models import Hike, User, Trip,Category,  db_drop_and_create_all, db_create_all
 from auth.auth import  requires_auth
 from config import app
 from constants import RECORDS_PER_PAGE
@@ -153,6 +153,44 @@ def delete_drink(payload, hike_id):
         })
     except:
         abort(422)
+
+
+#Categories API Endpoints
+@app.route('/app/v1/categories')
+def get_categories():
+    try:
+
+        categories = Category.query.all()
+
+        return jsonify({
+            "success": True,
+            "categories": [category.format() for category in categories]
+        })
+
+    except:
+        abort(422)
+
+@app.route('/app/v1/catagories', methods = ['POST'])
+# @requires_auth('post:catagories')
+def add_category():
+
+    body = request.get_json()
+
+    title = body.get('title')
+    description = body.get('description')
+    cover = body.get('cover')
+
+    # try:
+    category = Category(title=title, description=description, cover=cover)
+    category.insert()
+
+    return jsonify({
+        "category": category.format()
+    })
+
+    # except:
+    #     abort(422)
+
 
 # Users API Endpoints
 @app.route('/api/v1/users')
