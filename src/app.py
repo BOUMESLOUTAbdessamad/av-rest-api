@@ -177,6 +177,25 @@ def get_categories():
     except:
         abort(422)
 
+
+@app.route('/api/v1/categories/<category_id>/hikes')
+def get_hikes_by_category(category_id):
+    try:
+
+        # if category_id is None:
+        #     abort(404)
+
+        hikes = Hike.query.filter(Hike.category_id == category_id).all()
+
+        return jsonify({
+            "success": True,
+            "hikes": [hike.format() for hike in hikes]
+        })
+
+    except:
+        abort(422)
+
+
 @app.route('/app/v1/catagories', methods = ['POST'])
 # @requires_auth('post:catagories')
 def add_category():
