@@ -32,7 +32,7 @@ def db_drop_and_create_all():
         price = 1500,
         description = "On this super jeep excursion, we take you off the beaten track and chase one of the world's most mysterious phenomena. Leave the city's bright lights behind to see the Northern Lights while your guide tells you about this natural wonder!" ,
         duration = "5 Hours", # In Hours/days
-        departs_from = "N°93 cité 261, Hai En nedjma, Oran",
+        departs_from = "Oran",
         difficulty = 'Easy', # Enum [Easy, Medium, Difficult] 
         group_max = 10,
         group_min = 5,
@@ -40,7 +40,6 @@ def db_drop_and_create_all():
         pick_up = True 
     )
     hike.insert()
-
 
 def db_create_all():
     db.create_all()
@@ -61,10 +60,6 @@ def db_create_all():
 
     hike.insert()
 
-
-
-
-
 class Hike(db.Model):
     __tablename__ = "hikes"
 
@@ -83,7 +78,6 @@ class Hike(db.Model):
     trips = db.relationship('Trip', backref='hike')
     categories = db.relationship('Category', backref='hike') # Treck, Camping, Bushcraft, Short Stay, Trend
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
-
     cover = db.Column(db.String(), nullable=True)
     
     def insert(self):
