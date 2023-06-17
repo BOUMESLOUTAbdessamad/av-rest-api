@@ -206,17 +206,16 @@ def add_category():
     description = body.get('description')
     cover = body.get('cover')
 
-    # try:
-    category = Category(title=title, description=description, cover=cover)
-    category.insert()
+    try:
+        category = Category(title=title, description=description, cover=cover)
+        category.insert()
 
-    return jsonify({
-        "category": category.format()
-    })
+        return jsonify({
+            "category": category.format()
+        })
 
-    # except:
-    #     abort(422)
-
+    except:
+        abort(422)
 
 # Users API Endpoints
 @app.route('/api/v1/users')
