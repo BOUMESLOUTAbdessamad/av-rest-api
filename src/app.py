@@ -156,7 +156,7 @@ def delete_drink(payload, hike_id):
 
 
 #Categories API Endpoints
-@app.route('/app/v1/categories')
+@app.route('/api/v1/categories')
 def get_categories():
     try:
 
