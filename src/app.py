@@ -68,6 +68,8 @@ def create_hikes():
     min_age = body.get('min_age')
     pick_up = body.get('pick_up')
 
+    cover = body.get('cover')
+    category_id = body.get('category_id')
 
     try:
         hike = Hike(
@@ -80,7 +82,9 @@ def create_hikes():
                 group_max=group_max,
                 group_min=group_min,
                 min_age=min_age,
-                pick_up=pick_up
+                pick_up=pick_up,
+                cover=cover,
+                category_id=category_id
             )
         
         hike.insert()
