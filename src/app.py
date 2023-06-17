@@ -111,7 +111,8 @@ def update_hike(payload, hike_id):
     group_min = body.get('group_min')
     min_age = body.get('min_age')
     pick_up = body.get('pick_up')
-    # cover_image = body.get('cover_image')
+    category_id = body.get('category_id')
+    cover = body.get('cover')
 
     try:
         hike = Hike.query.filter(Hike.id == hike_id).one_or_none()
@@ -126,6 +127,8 @@ def update_hike(payload, hike_id):
         hike.group_min = group_min
         hike.min_age = min_age
         hike.pick_up = pick_up
+        hike.cover=cover
+        hike.category_id = category_id
 
         hike.update()
 
