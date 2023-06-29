@@ -23,7 +23,6 @@ def index():
     return "Welcome to Adventure Vibe"
 
 # Hikes API Endpoints
-
 @app.route('/api/v1/hikes') 
 def get_hikes():
     data = Hike.query.all()
@@ -62,12 +61,13 @@ def create_hikes():
     description = body.get('description')
     duration = body.get('duration')
     departs_from = body.get('departs_from')
+    depart_date = body.get('depart_date')
     difficulty = body.get('difficulty')
+    distance = body.get('distance')
     group_max = body.get('group_max')
     group_min = body.get('group_min')
     min_age = body.get('min_age')
     pick_up = body.get('pick_up')
-
     cover = body.get('cover')
     category_id = body.get('category_id')
 
@@ -78,7 +78,9 @@ def create_hikes():
                 description=description,
                 duration=duration,
                 departs_from=departs_from,
+                depart_date=depart_date,
                 difficulty=difficulty,
+                distance=distance,
                 group_max=group_max,
                 group_min=group_min,
                 min_age=min_age,
@@ -86,7 +88,7 @@ def create_hikes():
                 cover=cover,
                 category_id=category_id
             )
-        
+
         hike.insert()
         return jsonify({
             "success": True,
@@ -96,10 +98,9 @@ def create_hikes():
     except:
         abort(422)
 
-
 @app.route('/api/v1/hikes/<int:hike_id>', methods=['PATCH'])
-@requires_auth('patch:hikes')
-def update_hike(payload, hike_id):
+# @requires_auth('patch:hikes')
+def update_hike(hike_id):
 
     if hike_id is None:
         abort(404)
@@ -111,6 +112,8 @@ def update_hike(payload, hike_id):
     duration = body.get('duration')
     departs_from = body.get('departs_from')
     difficulty = body.get('difficulty')
+    depart_date = body.get('depart_date')
+    distance = body.get('distance')
     group_max = body.get('group_max')
     group_min = body.get('group_min')
     min_age = body.get('min_age')
@@ -127,11 +130,13 @@ def update_hike(payload, hike_id):
         hike.duration = duration
         hike.departs_from = departs_from
         hike.difficulty = difficulty
+        hike.depart_date = depart_date
+        hike.distance = distance
         hike.group_max = group_max
         hike.group_min = group_min
         hike.min_age = min_age
         hike.pick_up = pick_up
-        hike.cover=cover
+        hike.cover = cover
         hike.category_id = category_id
 
         hike.update()
@@ -143,7 +148,6 @@ def update_hike(payload, hike_id):
     except:
         abort(422)
 
-
 @app.route('/api/v1/hikes/<int:hike_id>', methods=['DELETE'])
 @requires_auth('delete:hikes')
 def delete_drink(payload, hike_id):
@@ -151,7 +155,7 @@ def delete_drink(payload, hike_id):
 
     if not hile:
         abort(404)
-    
+
     try:
         hile.delete()
         return jsonify({
@@ -160,7 +164,6 @@ def delete_drink(payload, hike_id):
         })
     except:
         abort(422)
-
 
 #Categories API Endpoints
 @app.route('/api/v1/categories')
@@ -232,7 +235,6 @@ def get_users(payload):
     except:
         abort(404)
 
-
 @app.route('/api/v1/users', methods=['POST'])
 @requires_auth('post:users')
 def add_user(payload):
@@ -290,7 +292,6 @@ def user_details(payload):
 
 
 #Trips API Endpoints
-
 @app.route('/api/v1/trips')
 @requires_auth('get:trips')
 def get_bookings(payload):
@@ -324,7 +325,7 @@ def book_hike(payload):
 @requires_auth('get:user-trips')
 def get_trips_by_user(payload, user_id):
 
-    trips = Trip.query.join(Hike).filter(Trip.auth0_user_id == user_id).all()
+    trips = Trip.query.join(Hike).filter(Trip.auth0_user_id == user_id).order_by(Trip.id ).all()
 
     return jsonify({
         "success": True,
@@ -333,7 +334,7 @@ def get_trips_by_user(payload, user_id):
 
 
 @app.route('/api/v1/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
-# @requires_auth('delete:user-trips')
+@requires_auth('delete:user-trips')
 def delete_trip_by_user(payload, user_id, trip_id):
 
     trip = Trip.query.filter(Trip.auth0_user_id == user_id, Trip.id == trip_id).one_or_none()
@@ -346,6 +347,3 @@ def delete_trip_by_user(payload, user_id, trip_id):
         })
     except:
         abort(422)
-
-
-

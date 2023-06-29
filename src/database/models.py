@@ -31,9 +31,10 @@ def db_drop_and_create_all():
         title='SUPER JEEP NORTHERN LIGHTS HUNT - FREE PHOTOS INCLUDED',
         price = 1500,
         description = "On this super jeep excursion, we take you off the beaten track and chase one of the world's most mysterious phenomena. Leave the city's bright lights behind to see the Northern Lights while your guide tells you about this natural wonder!" ,
-        duration = "5 Hours", # In Hours/days
+        duration = "5 Hours", # In Hours
         departs_from = "Oran",
-        difficulty = 'Easy', # Enum [Easy, Medium, Difficult] 
+        difficulty = 'Easy', # Enum [Easy, Medium, Difficult]
+        distance = 10.5, # 10.5 KM
         group_max = 10,
         group_min = 5,
         min_age = '16',
@@ -49,9 +50,11 @@ def db_create_all():
         title='SUPER JEEP NORTHERN LIGHTS HUNT - FREE PHOTOS INCLUDED',
         price = 1500,
         description = "On this super jeep excursion, we take you off the beaten track and chase one of the world's most mysterious phenomena. Leave the city's bright lights behind to see the Northern Lights while your guide tells you about this natural wonder!" ,
-        duration = "5 Hours", # In Hours/days
+        duration = "5 Hours", # In Hours
         departs_from = "N°93 cité 261, Hai En nedjma, Oran",
-        difficulty = 'Easy', # Enum [Easy, Medium, Difficult] 
+        # depart_date = "12-06-2023"
+        difficulty = 'Easy', # Enum [Easy, Medium, Difficult]
+        distance = 10.5, # 10.5 KM
         group_max = 10,
         group_min = 5,
         min_age = '16',
@@ -67,9 +70,11 @@ class Hike(db.Model):
     title = db.Column(db.String(80), nullable=True) 
     price = db.Column(db.Float, nullable=True)
     description = db.Column(db.String(500), nullable=True) 
-    duration = db.Column(db.String(100), nullable=True) # In Hours/days
+    duration = db.Column(db.String(100), nullable=True) # In Hours
     departs_from = db.Column(db.String(255), nullable=True)
+    depart_date = db.Column(db.DateTime, nullable=True)
     difficulty = db.Column(db.String(255), nullable=True) # Array [Easy, Medium, Difficult] 
+    distance = db.Column(db.Float, nullable=True)
     group_max = db.Column(db.Integer, nullable=True)
     group_min = db.Column(db.Integer, nullable=True)
     min_age = db.Column(db.String(100), nullable=True)
@@ -98,8 +103,10 @@ class Hike(db.Model):
             'price': self.price,
             'description': self.description,
             'duration': self.duration,
+            'distance': self.distance,
             'departs_from': self.departs_from,
             'difficulty': self.difficulty,
+            'depart_date': self.depart_date,
             'group_max': self.group_max,
             'group_min': self.group_min,
             'min_age': self.min_age,
