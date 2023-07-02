@@ -121,23 +121,27 @@ def update_hike(hike_id):
     category_id = body.get('category_id')
     cover = body.get('cover')
 
-    try:
-        hike = Hike.query.filter(Hike.id == hike_id).one_or_none()
+    hike = Hike.query.filter(Hike.id == hike_id).one_or_none()
 
-        hike.title = title
-        hike.price = price
-        hike.description = description
-        hike.duration = duration
-        hike.departs_from = departs_from
-        hike.difficulty = difficulty
-        hike.depart_date = depart_date
-        hike.distance = distance
-        hike.group_max = group_max
-        hike.group_min = group_min
-        hike.min_age = min_age
-        hike.pick_up = pick_up
-        hike.cover = cover
-        hike.category_id = category_id
+    if not hike:
+        abort(404)
+
+    hike.title = title
+    hike.price = price
+    hike.description = description
+    hike.duration = duration
+    hike.departs_from = departs_from
+    hike.difficulty = difficulty
+    hike.depart_date = depart_date
+    hike.distance = distance
+    hike.group_max = group_max
+    hike.group_min = group_min
+    hike.min_age = min_age
+    hike.pick_up = pick_up
+    hike.cover = cover
+    hike.category_id = category_id
+
+    try:
 
         hike.update()
 
