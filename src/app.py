@@ -8,7 +8,7 @@ from auth.auth import  requires_auth
 from config import app
 from constants import RECORDS_PER_PAGE
 from datetime import datetime
-from helpers import paginate_hikes
+from helpers import paginate_data
 
 # with app.app_context():
 #     db_create_all()
@@ -26,7 +26,7 @@ def index():
 @app.route('/api/v1/hikes') 
 def get_hikes():
     data = Hike.query.all()
-    hikes = paginate_hikes(request, data)
+    hikes = paginate_data(request, data)
 
     try:
         return jsonify({

@@ -10,15 +10,13 @@ def format_datetime(value, format='medium'):
       pattern="EE MM, dd, y h:mma"
   return babel.dates.format_datetime(date, pattern, locale='en')
 
-
-
-def paginate_hikes(request, data):
+def paginate_data(request, data):
     page = request.args.get("page", 1, type=int)
 
     start = (page - 1) * RECORDS_PER_PAGE
     end = start + RECORDS_PER_PAGE
 
-    hikes = [hike.format() for hike in data]
-    current_hikes = hikes[start:end]
+    data = [hike.format() for hike in data]
+    current_data = data[start:end]
 
-    return current_hikes
+    return current_data
