@@ -52,7 +52,7 @@ def get_hikes_detail(hike_id):
 
 
 @app.route('/api/v1/hikes', methods=['POST'])
-# @requires_auth('post:hikes')
+@requires_auth('post:hikes')
 def create_hikes():
 
     body = request.get_json()
@@ -204,7 +204,7 @@ def get_hikes_by_category(category_id):
 
 
 @app.route('/app/v1/catagories', methods = ['POST'])
-# @requires_auth('post:catagories')
+@requires_auth('post:catagories')
 def add_category():
 
     body = request.get_json()
