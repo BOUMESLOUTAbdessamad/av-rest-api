@@ -1,5 +1,5 @@
 
-# Capstone Project | Adventure Vibe API v1.1.0 Documentation  [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+# Adventure Vibe API v1.1.0 Documentation  [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
 After a busy week of hardwork, you may go out for a weekend alone or with your awesome friends, to walk, relax and feel the energy of nature. Adventure Vibe is a travel app for hikers. It allows you book a trip in one click.
 
