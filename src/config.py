@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from database.models import db_migrate, setup_db
+from server_config import db_migrate, setup_db
 from flask_cors import CORS
 
 #----------------------------------------------------------------------------#

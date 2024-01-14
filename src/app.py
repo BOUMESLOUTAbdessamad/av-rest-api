@@ -3,7 +3,8 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 
-from database.models import Hike, User, Trip,Category,  db_drop_and_create_all, db_create_all
+from database.models import User, Trip,  db_drop_and_create_all, db_create_all
+from database.hike_models import Hike, Category
 from auth.auth import  requires_auth
 from config import app
 from constants import RECORDS_PER_PAGE
