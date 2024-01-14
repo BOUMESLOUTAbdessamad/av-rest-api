@@ -10,6 +10,9 @@ from constants import RECORDS_PER_PAGE
 from datetime import datetime
 from helpers import paginate_data
 
+import stripe
+
+
 # with app.app_context():
 #     db_create_all()
 
@@ -350,4 +353,32 @@ def delete_trip_by_user(payload, user_id, trip_id):
             "message": "Trip deleted"
         })
     except:
-        abort(422)
+        abort(422)@app.route('/payment-sheet', methods=['POST'])
+def payment_sheet():
+
+    # Set your secret key. Remember to switch to your live secret key in production.
+    # See your keys here: https://dashboard.stripe.com/apikeys
+    stripe.api_key = 'STRIPE_APIKEY'
+
+    # Use an existing Customer ID if this is a returning customer
+    customer = stripe.Customer.create()
+
+    ephemeralKey = stripe.EphemeralKey.create(
+        customer=customer['id'],
+        stripe_version='2023-10-16',
+    )
+
+    paymentIntent = stripe.PaymentIntent.create(
+        amount=1099,
+        currency='eur',
+        customer=customer['id'],
+        # In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+        automatic_payment_methods={
+            'enabled': True,
+        },
+    )
+
+    return jsonify(paymentIntent=paymentIntent.client_secret,
+                    ephemeralKey=ephemeralKey.secret,
+                    customer=customer.id,
+                    publishableKey='STRIPE_PUB_KEY')
