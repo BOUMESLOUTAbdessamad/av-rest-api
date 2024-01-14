@@ -27,7 +27,7 @@ def index():
     return "Welcome to Adventure Vibe"
 
 # Hikes API Endpoints
-@app.route('/api/v1/hikes') 
+@app.route('/hikes') 
 def get_hikes():
     data = Hike.query.all()
     hikes = paginate_data(request, data)
@@ -41,7 +41,7 @@ def get_hikes():
     except:
         abort(404)
 
-@app.route('/api/v1/hikes-detail/<int:hike_id>')
+@app.route('/hikes-detail/<int:hike_id>')
 def get_hikes_detail(hike_id):
 
     try:
@@ -55,8 +55,8 @@ def get_hikes_detail(hike_id):
         abort(404)
 
 
-@app.route('/api/v1/hikes', methods=['POST'])
-@requires_auth('post:hikes')
+@app.route('/hikes', methods=['POST'])
+# @requires_auth('post:hikes')
 def create_hikes():
 
     body = request.get_json()
@@ -77,21 +77,21 @@ def create_hikes():
 
     try:
         hike = Hike(
-                title=title,
-                price=price,
-                description=description,
-                duration=duration,
-                departs_from=departs_from,
-                depart_date=depart_date,
-                difficulty=difficulty,
-                distance=distance,
-                group_max=group_max,
-                group_min=group_min,
-                min_age=min_age,
-                pick_up=pick_up,
-                cover=cover,
-                category_id=category_id
-            )
+            title=title,
+            price=price,
+            description=description,
+            duration=duration,
+            departs_from=departs_from,
+            depart_date=depart_date,
+            difficulty=difficulty,
+            distance=distance,
+            group_max=group_max,
+            group_min=group_min,
+            min_age=min_age,
+            pick_up=pick_up,
+            cover=cover,
+            category_id=category_id
+        )
 
         hike.insert()
         return jsonify({
@@ -102,7 +102,7 @@ def create_hikes():
     except:
         abort(422)
 
-@app.route('/api/v1/hikes/<int:hike_id>', methods=['PATCH'])
+@app.route('/hikes/<int:hike_id>', methods=['PATCH'])
 # @requires_auth('patch:hikes')
 def update_hike(hike_id):
 
@@ -156,7 +156,7 @@ def update_hike(hike_id):
     except:
         abort(422)
 
-@app.route('/api/v1/hikes/<int:hike_id>', methods=['DELETE'])
+@app.route('/hikes/<int:hike_id>', methods=['DELETE'])
 @requires_auth('delete:hikes')
 def delete_drink(payload, hike_id):
     hile = Hike.query.filter(Hike.id == hike_id).one_or_none()
@@ -174,7 +174,7 @@ def delete_drink(payload, hike_id):
         abort(422)
 
 #Categories API Endpoints
-@app.route('/api/v1/categories')
+@app.route('/categories')
 def get_categories():
     try:
 
@@ -189,7 +189,7 @@ def get_categories():
         abort(422)
 
 
-@app.route('/api/v1/categories/<category_id>/hikes')
+@app.route('/categories/<category_id>/hikes')
 def get_hikes_by_category(category_id):
     try:
 
@@ -208,7 +208,7 @@ def get_hikes_by_category(category_id):
 
 
 @app.route('/app/v1/catagories', methods = ['POST'])
-@requires_auth('post:catagories')
+# @requires_auth('post:catagories')
 def add_category():
 
     body = request.get_json()
@@ -229,7 +229,7 @@ def add_category():
         abort(422)
 
 # Users API Endpoints
-@app.route('/api/v1/users')
+@app.route('/users')
 @requires_auth('get:users')
 def get_users(payload):
     data = User.query.all()
@@ -243,7 +243,7 @@ def get_users(payload):
     except:
         abort(404)
 
-@app.route('/api/v1/users', methods=['POST'])
+@app.route('/users', methods=['POST'])
 @requires_auth('post:users')
 def add_user(payload):
 
@@ -289,7 +289,7 @@ def add_user(payload):
         abort(422)
 
 
-@app.route('/api/v1/user-details')
+@app.route('/user-details')
 @requires_auth('get:user-details')
 def user_details(payload):
 
@@ -300,7 +300,7 @@ def user_details(payload):
 
 
 #Trips API Endpoints
-@app.route('/api/v1/trips')
+@app.route('/trips')
 @requires_auth('get:trips')
 def get_bookings(payload):
 
@@ -311,7 +311,7 @@ def get_bookings(payload):
     except:
         abort(404)
 
-@app.route('/api/v1/trips', methods = ['POST'])
+@app.route('/trips', methods = ['POST'])
 @requires_auth('post:trips')
 def book_hike(payload):
 
@@ -329,7 +329,7 @@ def book_hike(payload):
         abort(422)
 
 
-@app.route('/api/v1/users/<user_id>/trips') 
+@app.route('/users/<user_id>/trips') 
 @requires_auth('get:user-trips')
 def get_trips_by_user(payload, user_id):
 
@@ -341,7 +341,7 @@ def get_trips_by_user(payload, user_id):
     })
 
 
-@app.route('/api/v1/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
+@app.route('/users/<user_id>/trips/<trip_id>', methods=['DELETE'])
 @requires_auth('delete:user-trips')
 def delete_trip_by_user(payload, user_id, trip_id):
 
@@ -354,7 +354,10 @@ def delete_trip_by_user(payload, user_id, trip_id):
             "message": "Trip deleted"
         })
     except:
-        abort(422)@app.route('/payment-sheet', methods=['POST'])
+        abort(422)
+
+
+@app.route('/payment-sheet', methods=['POST'])
 def payment_sheet():
 
     # Set your secret key. Remember to switch to your live secret key in production.
